@@ -11,12 +11,15 @@ import io.swagger.v3.oas.models.parameters.Parameter.StyleEnum;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 {{/dynamicOperations}}
 import okhttp3.*;
+
+import com.google.gson.annotations.SerializedName;
 import okhttp3.internal.http.HttpMethod;
 import okhttp3.internal.tls.OkHostnameVerifier;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import okio.BufferedSink;
 import okio.Okio;
+
 {{#joda}}
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -72,6 +75,7 @@ import {{invokerPackage}}.auth.OAuthFlow;
 
 public class ApiClient {
 
+    private final OkHttpClient client = new OkHttpClient();
     private String basePath = "{{{basePath}}}";
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
@@ -1540,7 +1544,7 @@ public class ApiClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-    }
+    }}
     {{#dynamicOperations}}
 
     public ApiClient createOperationLookupMap(OpenAPI openAPI) {
@@ -1610,6 +1614,6 @@ public class ApiClient {
             }
         }
         return path;
-    }
+    } }
+                }
     {{/dynamicOperations}}
-}

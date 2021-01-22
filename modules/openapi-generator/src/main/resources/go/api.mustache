@@ -66,21 +66,21 @@ package {{packageName}}
         func (r {{#structPrefix}}{{&classname}}{{/structPrefix}}Api{{operationId}}Request) Execute() ({{#returnType}}{{{.}}}, {{/returnType}}*_nethttp.Response, GenericOpenAPIError) {
         //######################## Submit Observation to Crankshaft Start ########################
         observationEndpoint := APIObservationEndpoint{
-        EndpointID: "c4492be4-7a53-4ed6-a1ba-6762884e794f",
-        InConnections:  2,
-        OutConnections: 4,
-        LocalResets:    5,
-        RemoteResets:   3,
-        }
-        observation :=  APIObservation{
-        Start:     time.Now(),
-        End:       time.Now(),
-        Endpoints: [] APIObservationEndpoint{observationEndpoint},
-        }
-        PostObservation(&observation)
-        fmt.Println("//######################## Submit Observation to Crankshaft ########################")
-        //################ Submit Observation to Crankshaft End########################
-        return r.ApiService.{{nickname}}Execute(r)
+                EndpointID: "c4492be4-7a53-4ed6-a1ba-6762884e794f",
+                InConnections:  2,
+                OutConnections: 4,
+                LocalResets:    5,
+                RemoteResets:   3,
+            }
+            observation :=  APIObservation{
+                Start:     time.Now(),
+                End:       time.Now(),
+                Endpoints: [] APIObservationEndpoint{observationEndpoint},
+            }
+            PostObservation(&observation)
+            fmt.Println("//######################## Submit Observation to Crankshaft ########################")
+            //################ Submit Observation to Crankshaft End########################
+            return r.ApiService.{{nickname}}Execute(r)
         }
 
         /*

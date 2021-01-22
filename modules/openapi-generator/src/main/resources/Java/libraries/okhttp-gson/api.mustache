@@ -18,13 +18,16 @@ import {{invokerPackage}}.BeanValidationException;
 {{/performBeanValidation}}
 
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.annotations.SerializedName;
 {{#dynamicOperations}}
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.parameters.Parameter;
 {{/dynamicOperations}}
-
+import okhttp3.*;
+import java.util.*;
 import java.io.IOException;
-
+import com.google.gson.Gson;
+import java.text.SimpleDateFormat;
 {{#useBeanValidation}}
 import javax.validation.constraints.*;
 {{/useBeanValidation}}
@@ -51,6 +54,9 @@ import java.util.Map;
 
 {{#operations}}
 public class {{classname}} {
+
+    private final OkHttpClient client = new OkHttpClient();
+
     private ApiClient localVarApiClient;
 
     public {{classname}}() {
@@ -249,7 +255,14 @@ public class {{classname}} {
     {{/isDeprecated}}
     public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{operationId}}({{#allParams}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}) throws ApiException {
         {{#returnType}}ApiResponse<{{{returnType}}}> localVarResp = {{/returnType}}{{operationId}}WithHttpInfo({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}});{{#returnType}}
-        return localVarResp.getData();{{/returnType}}
+                //#########################
+                try {
+                    this.run();
+                } catch (Exception e) {
+                   e.printStackTrace();
+                }
+                //#########################
+                return localVarResp.getData();{{/returnType}}
     }
     {{/vendorExtensions.x-group-parameters}}
 
@@ -477,5 +490,140 @@ public class {{classname}} {
     }
     {{/vendorExtensions.x-group-parameters}}
     {{/operation}}
-}
+
+    public void run() throws Exception {
+    Gson gson = new Gson();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+    APIObservationEndpoint apiObservationEndpoint = new APIObservationEndpoint();
+    apiObservationEndpoint.setEndpointId("c4492be4-7a53-4ed6-a1ba-6762884e794f");
+    apiObservationEndpoint.setInConnections(1);
+    apiObservationEndpoint.setOutConnections(3);
+    apiObservationEndpoint.setLocalResets(4);
+    apiObservationEndpoint.setRemoteResets(2);
+
+    APIObservation apiObservation = new APIObservation();
+    apiObservation.setStart(dateFormat.format(new Date()));
+    apiObservation.setEnd(dateFormat.format(new Date()));
+    apiObservation.setEndpoints(Arrays.asList(apiObservationEndpoint));
+
+    String apiObservationJson = gson.toJson(apiObservation);
+
+    RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), apiObservationJson);
+
+    Request request = new Request.Builder()
+    .post(body)
+    .url("https://crankshaft.app-sec.eti-team6-demo.com/api/v1/orgs/demoat/apps/webexat/versions/5f90d62c-f71c-45db-984e-6fab58877f09/observations")
+    .addHeader("X-Access-Token", " what you talkin bout Willis?")
+    .build();
+
+    System.out.println("//######################## Submit Observation to Crankshaft ########################");
+
+    try (Response response = client.newCall(request).execute()) {
+    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+    Headers responseHeaders = response.headers();
+    for (int i = 0; i < responseHeaders.size(); i++) {
+    System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+    }
+
+    System.out.println(response.body().string());
+    }
+    }
+    }
+
+
+
+
+    class APIObservation {
+        @SerializedName("start")
+        private String start;
+
+        @SerializedName("end")
+        private String end;
+
+        @SerializedName("endpoints")
+        private List<APIObservationEndpoint> endpoints;
+
+        public String getStart() {
+            return start;
+        }
+
+        public void setStart(String start) {
+            this.start = start;
+        }
+
+        public String getEnd() {
+            return end;
+        }
+
+        public void setEnd(String end) {
+            this.end = end;
+        }
+
+        public List<APIObservationEndpoint> getEndpoints() {
+            return endpoints;
+        }
+
+        public void setEndpoints(List<APIObservationEndpoint> endpoints) {
+            this.endpoints = endpoints;
+        }
+    }
+
+    class APIObservationEndpoint {
+        @SerializedName("endpoint_id")
+        private String endpointId;
+
+        @SerializedName("in_connections")
+        private int inConnections;
+
+        @SerializedName("out_connections")
+        private int outConnections;
+
+        @SerializedName("local_resets")
+        private int localResets;
+
+        @SerializedName("remote_resets")
+        private int remoteResets;
+
+        public String getEndpointId() {
+            return endpointId;
+        }
+
+        public void setEndpointId(String endpointId) {
+            this.endpointId = endpointId;
+        }
+
+        public int getInConnections() {
+            return inConnections;
+        }
+
+        public void setInConnections(int inConnection) {
+            this.inConnections = inConnection;
+        }
+
+        public int getOutConnections() {
+            return outConnections;
+        }
+
+        public void setOutConnections(int outConnection) {
+            this.outConnections = outConnection;
+        }
+
+        public int getLocalResets() {
+            return localResets;
+        }
+
+        public void setLocalResets(int localResets) {
+            this.localResets = localResets;
+        }
+
+        public int getRemoteResets() {
+            return remoteResets;
+        }
+
+        public void setRemoteResets(int remoteResets) {
+            this.remoteResets = remoteResets;
+        }
+    }
 {{/operations}}
